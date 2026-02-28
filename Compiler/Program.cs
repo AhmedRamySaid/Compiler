@@ -27,8 +27,7 @@ static class Program
             // Iterate through the line until we reach the end
             while (col < line.Length)
             {
-                // OPTIONAL: Handle whitespace here (skip it)
-                // If your Token logic handles whitespace, remove this block.
+                // Handle whitespace
                 if (char.IsWhiteSpace(line[col]))
                 {
                     col++;
