@@ -64,25 +64,24 @@ namespace JASON_Compiler
             Operators.Add(";", Token_Class.SEMICOLON_T);
         }
 
-    public void StartScanning(string SourceCode)
+    public void StartScanning(string sourceCode)
         {
-            for(int i=0; i<SourceCode.Length;i++)
+            for (int i = 0; i < sourceCode.Length; i++)
             {
                 int j = i;
-                char currentChar = SourceCode[i];
+                char currentChar = sourceCode[i];
                 StringBuilder currentLexime = new StringBuilder(currentChar.ToString());
 
-                if (currentChar == ' ' || currentChar == '\r' || currentChar == '\n')
+                if (Char.IsWhiteSpace(currentChar))
                     continue;
 
                 // Any letter in the english language
                 // Underscores are not allowed in tiny language
                 if (Char.IsLetter(currentChar))
                 {
-                    currentLexime.Append(currentChar);
-                    while (j < SourceCode.Length)
+                    while (j < sourceCode.Length)
                     {
-                        currentChar = SourceCode[++j];
+                        currentChar = sourceCode[++j];
                         if (Char.IsLetterOrDigit(currentChar))
                         {
                             currentLexime.Append(currentChar);
@@ -94,22 +93,93 @@ namespace JASON_Compiler
                     }
 
                     FindTokenClass(currentLexime.ToString());
-                    i = j-1;
+                    i = j - 1;
                 }
 
                 // Any digit
-                else if(currentChar >= '0' && currentChar <= '9')
+                else if (Char.IsDigit(currentChar))
                 {
-                   
+                    while (j < sourceCode.Length)
+                    {
+                        currentChar = sourceCode[++j];
+                        if (Char.IsDigit(currentChar) || currentChar == '.')
+                        {
+                            currentLexime.Append(currentChar);
+                        }
+                        else { break; }
+                    }
+                    FindTokenClass(currentLexime.ToString());
+                    i = j - 1;
                 }
 
-                else
+                else if (currentChar == '"')
                 {
-                   
+                    while (j < sourceCode.Length)
+                    {
+                        currentChar = sourceCode[++j];
+                        if (currentChar != '"')
+                        {
+                            currentLexime.Append(currentChar);
+                        }
+                        else
+                        {
+                            currentLexime.Append(currentChar);
+                            break;
+                        }
+                    }
+                    FindTokenClass(currentLexime.ToString());
+                    i = j - 1;
                 }
-            }
-            
-            JASON_Compiler.TokenStream = Tokens;
+
+                else if (currentChar == '/') // check for division or comment
+                {
+                    currentChar = sourceCode[++j];
+                    if (currentChar == '*') // if it was a comment
+                    {
+                        // iterate until we find * before /
+                        while (j < sourceCode.Length)
+                        {
+                            //currentChar = sourceCode[++j];
+                            while (j < sourceCode.Length && sourceCode[++j] != '/') { } // loop until j stands at /
+                            if (sourceCode[j - 1] == '*')
+                            {
+                                break;
+                            }
+                        }
+                        i = j;
+                    }
+                }
+
+                else if (true) // TODO: Handle double character operators
+                {
+
+                }
+
+                else if (Char.IsSymbol(currentChar) || Char.IsPunctuation(currentChar))
+                {
+                    FindTokenClass(currentChar.ToString());
+                }
+
+                /******* Comment *******/
+                else if (currentChar == '/')
+                {
+                    while (j < sourceCode.Length)
+                    {
+                        currentChar = sourceCode[++j];
+                        if (currentChar != '"')
+                        {
+                            currentLexime.Append(currentChar);
+                        }
+                        else
+                        {
+                            currentLexime.Append(currentChar);
+                            break;
+                        }
+                    }
+                }
+        }
+
+        JASON_Compiler.TokenStream = Tokens;
         }
         void FindTokenClass(string Lex)
         {
@@ -145,5 +215,12 @@ namespace JASON_Compiler
 
             return isValid;
         }
+        bool isOperator(string lex)
+        {
+            switch(lex) {
+                case "<>":
+                    break;
+        }
     }
 }
+
