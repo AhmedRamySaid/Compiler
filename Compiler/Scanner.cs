@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 public enum Token_Class
 {
-    Begin, Call, Declare, End, Do, Else, EndIf, EndUntil, EndWhile, If, Integer,
-    Parameters, Procedure, Program, Read, Real, Set, Then, Until, While, Write,
-    Dot, Semicolon, Comma, LParanthesis, RParanthesis, EqualOp, LessThanOp,
-    GreaterThanOp, NotEqualOp, PlusOp, MinusOp, MultiplyOp, DivideOp,
-    Idenifier, Constant
+    INT_T, FLOAT_T, STRING_T, READ_T, WRITE_T, REPEAT_T, UNTIL_T, IF_T, ELSEIF_T, 
+    ELSE_T, THEN_T, END_T, RETURN_T, ENDL_T, 
+    INT_LITERAL_T, FLOAT_LITERAL_T, STRING_LITERAL_T, IDENTIFIER_T,
+    PLUS_T, MINUS_T, MULTIPLY_T, DIVIDE_T, ASSIGN_T, LESS_THAN_T, GREATER_THAN_T,
+    EQUAL_T, NOT_EQUAL_T, LOGIC_AND_T, LOGIC_OR_T, 
+    L_CURLY_BRACKET_T, R_CURLY_BRACKET_T, L_PAREN_BRACKET_T, R_PAREN_BRACKET_T, SEMICOLON_T,
 }
 namespace JASON_Compiler
 {
-    
-
     public class Token
     {
        public string lex;
@@ -30,44 +30,38 @@ namespace JASON_Compiler
 
         public Scanner()
         {
-            ReservedWords.Add("IF", Token_Class.If);
-            ReservedWords.Add("BEGIN", Token_Class.Begin);
-            ReservedWords.Add("CALL", Token_Class.Call);
-            ReservedWords.Add("DECLARE", Token_Class.Declare);
-            ReservedWords.Add("END", Token_Class.End);
-            ReservedWords.Add("DO", Token_Class.Do);
-            ReservedWords.Add("ELSE", Token_Class.Else);
-            ReservedWords.Add("ENDIF", Token_Class.EndIf);
-            ReservedWords.Add("ENDUNTIL", Token_Class.EndUntil);
-            ReservedWords.Add("ENDWHILE", Token_Class.EndWhile);
-            ReservedWords.Add("INTEGER", Token_Class.Integer);
-            ReservedWords.Add("PARAMETERS", Token_Class.Parameters);
-            ReservedWords.Add("PROCEDURE", Token_Class.Procedure);
-            ReservedWords.Add("PROGRAM", Token_Class.Program);
-            ReservedWords.Add("READ", Token_Class.Read);
-            ReservedWords.Add("REAL", Token_Class.Real);
-            ReservedWords.Add("SET", Token_Class.Set);
-            ReservedWords.Add("THEN", Token_Class.Then);
-            ReservedWords.Add("UNTIL", Token_Class.Until);
-            ReservedWords.Add("WHILE", Token_Class.While);
-            ReservedWords.Add("WRITE", Token_Class.Write);
-
-            Operators.Add(".", Token_Class.Dot);
-            Operators.Add(";", Token_Class.Semicolon);
-            Operators.Add(",", Token_Class.Comma);
-            Operators.Add("(", Token_Class.LParanthesis);
-            Operators.Add(")", Token_Class.RParanthesis);
-            Operators.Add("=", Token_Class.EqualOp);
-            Operators.Add("<", Token_Class.LessThanOp);
-            Operators.Add(">", Token_Class.GreaterThanOp);
-            Operators.Add("!", Token_Class.NotEqualOp);
-            Operators.Add("+", Token_Class.PlusOp);
-            Operators.Add("-", Token_Class.MinusOp);
-            Operators.Add("*", Token_Class.MultiplyOp);
-            Operators.Add("/", Token_Class.DivideOp);
-
-
-
+            ReservedWords.Add("int", Token_Class.INT_T);
+            ReservedWords.Add("float", Token_Class.FLOAT_T);
+            ReservedWords.Add("string", Token_Class.STRING_T);
+            ReservedWords.Add("read", Token_Class.READ_T);
+            ReservedWords.Add("write", Token_Class.WRITE_T);
+            ReservedWords.Add("repeat", Token_Class.REPEAT_T);
+            ReservedWords.Add("until", Token_Class.UNTIL_T);
+            ReservedWords.Add("if", Token_Class.IF_T);
+            ReservedWords.Add("elseif", Token_Class.ELSEIF_T);
+            ReservedWords.Add("else", Token_Class.ELSE_T);
+            ReservedWords.Add("then", Token_Class.THEN_T);
+            ReservedWords.Add("end", Token_Class.END_T);
+            ReservedWords.Add("return", Token_Class.RETURN_T);
+            ReservedWords.Add("endl", Token_Class.ENDL_T);
+            
+            Operators.Add("+", Token_Class.PLUS_T);
+            Operators.Add("-", Token_Class.MINUS_T);
+            Operators.Add("*", Token_Class.MULTIPLY_T);
+            Operators.Add("/", Token_Class.DIVIDE_T);
+            
+            Operators.Add(":=", Token_Class.ASSIGN_T);
+            Operators.Add("<", Token_Class.LESS_THAN_T);
+            Operators.Add(">", Token_Class.GREATER_THAN_T);
+            Operators.Add("=", Token_Class.EQUAL_T);
+            Operators.Add("<>", Token_Class.NOT_EQUAL_T);
+            Operators.Add("&&", Token_Class.LOGIC_AND_T);
+            Operators.Add("||", Token_Class.LOGIC_OR_T);
+            Operators.Add("{", Token_Class.L_CURLY_BRACKET_T);
+            Operators.Add("}", Token_Class.R_CURLY_BRACKET_T);
+            Operators.Add("(", Token_Class.L_PAREN_BRACKET_T);
+            Operators.Add(")", Token_Class.R_PAREN_BRACKET_T);
+            Operators.Add(";", Token_Class.SEMICOLON_T);
         }
 
     public void StartScanning(string SourceCode)
@@ -75,25 +69,40 @@ namespace JASON_Compiler
             for(int i=0; i<SourceCode.Length;i++)
             {
                 int j = i;
-                char CurrentChar = SourceCode[i];
-                string CurrentLexeme = CurrentChar.ToString();
+                char currentChar = SourceCode[i];
+                StringBuilder currentLexime = new StringBuilder(currentChar.ToString());
 
-                if (CurrentChar == ' ' || CurrentChar == '\r' || CurrentChar == '\n')
+                if (currentChar == ' ' || currentChar == '\r' || currentChar == '\n')
                     continue;
 
-                if (CurrentChar >= 'A' && CurrentChar <= 'z') //if you read a character
+                // Any letter in the english language
+                // Underscores are not allowed in tiny language
+                if (Char.IsLetter(currentChar))
+                {
+                    currentLexime.Append(currentChar);
+                    while (j < SourceCode.Length)
+                    {
+                        currentChar = SourceCode[++j];
+                        if (Char.IsLetterOrDigit(currentChar))
+                        {
+                            currentLexime.Append(currentChar);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    FindTokenClass(currentLexime.ToString());
+                    i = j-1;
+                }
+
+                // Any digit
+                else if(currentChar >= '0' && currentChar <= '9')
                 {
                    
                 }
 
-                else if(CurrentChar >= '0' && CurrentChar <= '9')
-                {
-                   
-                }
-                else if(CurrentChar == '{')
-                {
-                   
-                }
                 else
                 {
                    
