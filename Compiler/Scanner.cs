@@ -191,8 +191,7 @@ namespace JASON_Compiler
 
             JASON_Compiler.TokenStream = Tokens;
         }
-
-        void FindTokenClass(string Lex)
+        public virtual void FindTokenClass(string Lex)
         {
             Token_Class TC;
             Token Tok = new Token();
