@@ -119,5 +119,31 @@ namespace Compiler.Tests
 
             result.Should().BeEquivalentTo(expected);
         }
+        
+        /*
+         * As per documentation, 0.14290.142 is valid so far and should not
+         * be handled inside the scanner
+         */
+        [Fact]
+        public void TestNumbers()
+        {
+            string input = 
+                @"
+                    int a = 0104091;
+                    float b = 15.2;
+                    float c = 0.14290.142;
+                 ";
+
+            var result = ScanTokens(input);
+
+            var expected = new List<string>
+            {
+                "int", "a", "=", "0104091", ";",
+                "float", "b", "=", "15.2", ";",
+                "float", "c", "=", "0.14290.142", ";"
+            };
+
+            result.Should().BeEquivalentTo(expected);
+        }
     }
 }
