@@ -160,7 +160,7 @@ namespace JASON_Compiler
                     }
                 }
 
-                else if (true) // TODO: Handle double character operators
+                else if (false) // TODO: Handle double character operators
                 {
 
                 }
