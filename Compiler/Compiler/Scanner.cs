@@ -82,7 +82,7 @@ namespace JASON_Compiler
                 // Underscores are not allowed in tiny language
                 if (Char.IsLetter(currentChar))
                 {
-                    while (j < sourceCode.Length)
+                    while (j + 1 < sourceCode.Length)
                     {
                         currentChar = sourceCode[++j];
                         if (Char.IsLetterOrDigit(currentChar))
@@ -102,7 +102,7 @@ namespace JASON_Compiler
                 // Any digit
                 else if (Char.IsDigit(currentChar))
                 {
-                    while (j < sourceCode.Length)
+                    while (j + 1 < sourceCode.Length)
                     {
                         currentChar = sourceCode[++j];
                         if (Char.IsDigit(currentChar) || currentChar == '.')
@@ -121,7 +121,7 @@ namespace JASON_Compiler
 
                 else if (currentChar == '"')
                 {
-                    while (j < sourceCode.Length)
+                    while (j + 1 < sourceCode.Length)
                     {
                         currentChar = sourceCode[++j];
                         if (currentChar != '"')
@@ -145,7 +145,7 @@ namespace JASON_Compiler
                     if (currentChar == '*') // if it was a comment
                     {
                         // iterate until we find * before /
-                        while (j < sourceCode.Length)
+                        while (j + 1 < sourceCode.Length)
                         {
                             //currentChar = sourceCode[++j];
                             while (j < sourceCode.Length && sourceCode[++j] != '/')
@@ -175,7 +175,7 @@ namespace JASON_Compiler
                 /******* Comment *******/
                 else if (currentChar == '/')
                 {
-                    while (j < sourceCode.Length)
+                    while (j + 1 < sourceCode.Length)
                     {
                         currentChar = sourceCode[++j];
                         if (currentChar != '"')
@@ -208,15 +208,46 @@ namespace JASON_Compiler
             }
 
             //Is it an identifier?
+            if (isIdentifier(Tok.lex))
+            {
+                Tok.token_type = Token_Class.IDENTIFIER_T;
+                Tokens.Add(Tok);
+                return;
+            }
 
             //Is it a Constant?
+            if (isConstant(Tok.lex))
+            {
+                if (Tok.lex.Contains("."))
+                {
+                    Tok.token_type = Token_Class.FLOAT_LITERAL_T;
+                }
+                else {
+                    Tok.token_type = Token_Class.INT_LITERAL_T; 
+                }
+                Tokens.Add(Tok);
+                return;
+            }
 
             //Is it an operator?
+            if (isOperator(Tok.lex))
+            {
+                Tok.token_type = Operators[Tok.lex];
+                Tokens.Add(Tok);
+                return;
+            }
+
+            // Is it a String?
+            if (isString(Tok.lex))
+            {
+                Tok.token_type = Token_Class.STRING_LITERAL_T;
+                Tokens.Add(Tok);
+                return;
+            }
 
             //Is it an undefined?
+            Errors.Error_List.Add(Tok.lex);
         }
-
-
 
         public bool isIdentifier(string lex)
         {
