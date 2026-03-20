@@ -148,7 +148,7 @@ namespace JASON_Compiler
                         while (j + 1 < sourceCode.Length)
                         {
                             //currentChar = sourceCode[++j];
-                            while (j < sourceCode.Length && sourceCode[++j] != '/')
+                            while (j + 1 < sourceCode.Length && sourceCode[++j] != '/')
                             {
                             } // loop until j stands at /
 
@@ -160,35 +160,24 @@ namespace JASON_Compiler
 
                         i = j;
                     }
-                }
-
-                else if (false) // TODO: Handle double character operators
-                {
 
                 }
 
                 else if (Char.IsSymbol(currentChar) || Char.IsPunctuation(currentChar))
                 {
+                    if (i + 1 < sourceCode.Length)
+                    {
+                        string possibleOperator = currentChar.ToString() + sourceCode[i+1].ToString();
+                        if (Operators.ContainsKey(possibleOperator))
+                        {
+                            FindTokenClass(possibleOperator);
+                            i = i + 1;
+                            continue;
+                        }
+                    }
                     FindTokenClass(currentChar.ToString());
                 }
 
-                /******* Comment *******/
-                else if (currentChar == '/')
-                {
-                    while (j + 1 < sourceCode.Length)
-                    {
-                        currentChar = sourceCode[++j];
-                        if (currentChar != '"')
-                        {
-                            currentLexime.Append(currentChar);
-                        }
-                        else
-                        {
-                            currentLexime.Append(currentChar);
-                            break;
-                        }
-                    }
-                }
             }
 
             JASON_Compiler.TokenStream = Tokens;
