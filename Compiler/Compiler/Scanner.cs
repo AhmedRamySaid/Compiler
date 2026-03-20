@@ -14,12 +14,13 @@ public enum Token_Class
     EQUAL_T, NOT_EQUAL_T, LOGIC_AND_T, LOGIC_OR_T, 
     L_CURLY_BRACKET_T, R_CURLY_BRACKET_T, L_PAREN_BRACKET_T, R_PAREN_BRACKET_T, SEMICOLON_T,
 }
+
 namespace JASON_Compiler
 {
     public class Token
     {
-       public string lex;
-       public Token_Class token_type;
+        public string lex;
+        public Token_Class token_type;
     }
 
     public class Scanner
@@ -44,12 +45,12 @@ namespace JASON_Compiler
             ReservedWords.Add("end", Token_Class.END_T);
             ReservedWords.Add("return", Token_Class.RETURN_T);
             ReservedWords.Add("endl", Token_Class.ENDL_T);
-            
+
             Operators.Add("+", Token_Class.PLUS_T);
             Operators.Add("-", Token_Class.MINUS_T);
             Operators.Add("*", Token_Class.MULTIPLY_T);
             Operators.Add("/", Token_Class.DIVIDE_T);
-            
+
             Operators.Add(":=", Token_Class.ASSIGN_T);
             Operators.Add("<", Token_Class.LESS_THAN_T);
             Operators.Add(">", Token_Class.GREATER_THAN_T);
@@ -64,7 +65,7 @@ namespace JASON_Compiler
             Operators.Add(";", Token_Class.SEMICOLON_T);
         }
 
-    public void StartScanning(string sourceCode)
+        public void StartScanning(string sourceCode)
         {
             for (int i = 0; i < sourceCode.Length; i++)
             {
@@ -106,8 +107,12 @@ namespace JASON_Compiler
                         {
                             currentLexime.Append(currentChar);
                         }
-                        else { break; }
+                        else
+                        {
+                            break;
+                        }
                     }
+
                     FindTokenClass(currentLexime.ToString());
                     i = j - 1;
                 }
@@ -127,6 +132,7 @@ namespace JASON_Compiler
                             break;
                         }
                     }
+
                     FindTokenClass(currentLexime.ToString());
                     i = j - 1;
                 }
@@ -140,17 +146,21 @@ namespace JASON_Compiler
                         while (j < sourceCode.Length)
                         {
                             //currentChar = sourceCode[++j];
-                            while (j < sourceCode.Length && sourceCode[++j] != '/') { } // loop until j stands at /
+                            while (j < sourceCode.Length && sourceCode[++j] != '/')
+                            {
+                            } // loop until j stands at /
+
                             if (sourceCode[j - 1] == '*')
                             {
                                 break;
                             }
                         }
+
                         i = j;
                     }
                 }
 
-                else if (true) // TODO: Handle double character operators
+                else if (false) // TODO: Handle double character operators
                 {
 
                 }
@@ -177,20 +187,20 @@ namespace JASON_Compiler
                         }
                     }
                 }
-        }
+            }
 
-        JASON_Compiler.TokenStream = Tokens;
+            JASON_Compiler.TokenStream = Tokens;
         }
-        void FindTokenClass(string Lex)
+        public virtual void FindTokenClass(string Lex)
         {
             Token_Class TC;
             Token Tok = new Token();
             Tok.lex = Lex;
             //Is it a reserved word?
-            
+
 
             //Is it an identifier?
-            
+
 
             //Is it a Constant?
 
@@ -199,15 +209,16 @@ namespace JASON_Compiler
             //Is it an undefined?
         }
 
-    
+
 
         bool isIdentifier(string lex)
         {
-            bool isValid=true;
+            bool isValid = true;
             // Check if the lex is an identifier or not.
-            
+
             return isValid;
         }
+
         bool isConstant(string lex)
         {
             bool isValid = true;
@@ -215,11 +226,16 @@ namespace JASON_Compiler
 
             return isValid;
         }
+
         bool isOperator(string lex)
         {
-            switch(lex) {
+            switch (lex)
+            {
                 case "<>":
                     break;
+            }
+
+            return false;
         }
     }
 }
