@@ -218,21 +218,21 @@ namespace JASON_Compiler
 
 
 
-        bool isIdentifier(string lex)
+        public bool isIdentifier(string lex)
         {
             return Regex.IsMatch(lex, "^[a-zA-Z][a-zA-Z0-9]*$");
         }
 
-        bool isConstant(string lex)
+        public bool isConstant(string lex)
         {
-            return Regex.IsMatch(lex, "^[0-9]+([.][0-9])+$");
+            return Regex.IsMatch(lex, "^[0-9]+([.][0-9]+)?$");
         }
-        bool isString(string lex)
+        public bool isString(string lex)
         {
             return Regex.IsMatch(lex, @"^""[^""]*""$");
         }
 
-        bool isOperator(string lex)
+        public bool isOperator(string lex)
         {
             return Operators.ContainsKey(lex);
         }
