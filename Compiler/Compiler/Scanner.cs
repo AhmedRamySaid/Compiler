@@ -136,31 +136,34 @@ namespace JASON_Compiler
                     }
 
                     FindTokenClass(currentLexime.ToString());
-                    i = j - 1;
+                    i = j;
                 }
 
-                else if (currentChar == '/') // check for division or comment
+                else if (currentChar == '/')
                 {
-                    currentChar = sourceCode[++j];
-                    if (currentChar == '*') // if it was a comment
+                    // 1. Safe Look-ahead for comment
+                    if (i + 1 < sourceCode.Length && sourceCode[i + 1] == '*')
                     {
+                        j++; // Move j to the '*'
+
                         // iterate until we find * before /
                         while (j + 1 < sourceCode.Length)
                         {
-                            //currentChar = sourceCode[++j];
                             while (j + 1 < sourceCode.Length && sourceCode[++j] != '/')
-                            {
-                            } // loop until j stands at /
+                            { } // loop until j stands at /
 
                             if (sourceCode[j - 1] == '*')
                             {
                                 break;
                             }
                         }
-
-                        i = j;
+                        i = j; // Skip the whole comment
                     }
-
+                    else // 2. If it's NOT a comment, it MUST be division!
+                    {
+                        FindTokenClass("/");
+                        // we don't change 'i' here. The outer loop will naturally increment it.
+                    }
                 }
 
                 else if (Char.IsSymbol(currentChar) || Char.IsPunctuation(currentChar))
