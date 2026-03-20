@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -186,11 +188,16 @@ namespace JASON_Compiler
             Token_Class TC;
             Token Tok = new Token();
             Tok.lex = Lex;
+
             //Is it a reserved word?
-            
+            if (ReservedWords.ContainsKey(Tok.lex))
+            {
+                Tok.token_type = ReservedWords[Tok.lex];
+                Tokens.Add(Tok);
+                return;
+            }
 
             //Is it an identifier?
-            
 
             //Is it a Constant?
 
@@ -203,23 +210,19 @@ namespace JASON_Compiler
 
         bool isIdentifier(string lex)
         {
-            bool isValid=true;
-            // Check if the lex is an identifier or not.
-            
-            return isValid;
+            return Regex.IsMatch(lex, "^[a-zA-Z][a-zA-Z0-9]*$");
         }
         bool isConstant(string lex)
         {
-            bool isValid = true;
-            // Check if the lex is a constant (Number) or not.
-
-            return isValid;
+            return Regex.IsMatch(lex, "^[0-9]+([.][0-9])+$");
+        }
+        bool isString(string lex)
+        {
+            return Regex.IsMatch(lex, @"^""[^""]*""$");
         }
         bool isOperator(string lex)
         {
-            switch(lex) {
-                case "<>":
-                    break;
+            return Operators.ContainsKey(lex);
         }
     }
 }
