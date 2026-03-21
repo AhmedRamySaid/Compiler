@@ -23,6 +23,14 @@ namespace JASON_Compiler
     {
         public string lex;
         public Token_Class token_type;
+
+        public Token(Token_Class token_type, string lex)
+        {
+            this.lex = lex;
+            this.token_type = token_type;
+        }
+
+        public Token() { }
     }
 
     public class Scanner

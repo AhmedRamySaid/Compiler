@@ -36,7 +36,7 @@ namespace Compiler.Tests
             string input = 
                 @"
                     int float string read write repeat
-                    until if else then end return endl
+                    until if else elseif then end return endl
                  ";
 
             var result = ScanTokens(input);
@@ -51,7 +51,7 @@ namespace Compiler.Tests
             result.Should().BeEquivalentTo(expected);
         }
         
-        /***** Tests an example code snippet *****/
+        /***** Tests an example of a working code snippet *****/
         [Fact]
         public void TestBasicCode()
         {
@@ -142,6 +142,51 @@ namespace Compiler.Tests
                 "int", "a", "=", "0104091", ";",
                 "float", "b", "=", "15.2", ";",
                 "float", "c", "=", "0.14290.142", ";"
+            };
+
+            result.Should().BeEquivalentTo(expected);
+        }
+        
+        /***** Tests an example of a working code snippet missing a semicolon *****/
+        /*
+         * FAILED
+         * Infinite loop
+         * todo: fix
+         */
+        [Fact]
+        public void TestBasicCodeNoSemiColon()
+        {
+            string input = @"int x = 5 + 6.5";
+            
+            var result = ScanTokens(input);
+            
+            var expected = new List<string>
+            {
+                "int", "x", "=", "5", "+", "6.5"
+            };
+
+            result.Should().BeEquivalentTo(expected);
+        }
+        
+        /*
+         * Tests an example of a non-working code snippet
+         * The code should still be scanned correctly
+         */
+        [Fact]
+        public void TestAdvancedInvalidCode()
+        {
+            string input = 
+                @"
+                    x int 10.5 = - 3
+                    float y x = int 5 2.1 /
+                 ";
+            
+            var result = ScanTokens(input);
+            
+            var expected = new List<string>
+            {
+                "x", "int", "10.5", "=","-", "3",
+                "float", "y", "x", "=", "int", "5", "2.1", "/"
             };
 
             result.Should().BeEquivalentTo(expected);
