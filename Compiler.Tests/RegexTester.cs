@@ -23,6 +23,8 @@ namespace Compiler.Tests
 
             // case 4: contains punctuation isn't valid as per the language specs
             scanner.isIdentifier("is-not-valid").Should().BeFalse();
+            scanner.isIdentifier("is_not_valid").Should().BeFalse();
+            scanner.isIdentifier("_isNotValid").Should().BeFalse();
         }
         
         /***** Test Strings *****/
