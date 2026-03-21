@@ -10,6 +10,7 @@ namespace Compiler.Tests
 {
     public class ScannerTester
     {
+        /***** Sets up stub function for the regex *****/
         private List<string> ScanTokens(string input)
         {
             var tokens = new List<string>();
@@ -28,6 +29,7 @@ namespace Compiler.Tests
             return tokens;
         }
         
+        /***** Tests every single reserved keyword *****/
         [Fact]
         public void TestReservedKeywords()
         {
@@ -49,6 +51,7 @@ namespace Compiler.Tests
             result.Should().BeEquivalentTo(expected);
         }
         
+        /***** Tests an example code snippet *****/
         [Fact]
         public void TestBasicCode()
         {
@@ -64,6 +67,7 @@ namespace Compiler.Tests
             result.Should().BeEquivalentTo(expected);
         }
         
+        /***** Tests if comments are correctly deleted *****/
         [Fact]
         public void TestComments()
         {
@@ -91,11 +95,7 @@ namespace Compiler.Tests
             result.Should().BeEquivalentTo(expected);
         }
         
-        /*
-         * Fails!
-         * '/' does not work
-         * todo: fix
-         */
+        /***** Tests single character operators *****/
         [Fact]
         public void TestSingleCharacterOperators()
         {
@@ -121,8 +121,9 @@ namespace Compiler.Tests
         }
         
         /*
-         * As per documentation, 0.14290.142 is valid so far and should not
-         * be handled inside the scanner
+         * Tests numbers
+         * As per documentation, multiple '.' are valid inside the scanner
+         * Handled inside regex
          */
         [Fact]
         public void TestNumbers()
