@@ -9,6 +9,7 @@
     &lt;TestId&gt;xUnit::760C0385-DCEF-46BF-8B21-84250E8E7F69::.NETFramework,Version=v4.8::Compiler.Tests.IntegratedTester.TestNumbers&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::760C0385-DCEF-46BF-8B21-84250E8E7F69::.NETFramework,Version=v4.8::Compiler.Tests.IntegratedTester.TestBasicCodeNoSemiColon&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::760C0385-DCEF-46BF-8B21-84250E8E7F69::.NETFramework,Version=v4.8::Compiler.Tests.ScannerTester&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::760C0385-DCEF-46BF-8B21-84250E8E7F69::.NETFramework,Version=v4.8::Compiler.Tests.IntegratedTester.TestAdvancedInvalidCode&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	
