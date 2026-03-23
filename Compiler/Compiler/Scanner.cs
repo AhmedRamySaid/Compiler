@@ -77,14 +77,19 @@ namespace JASON_Compiler
 
         public void StartScanning(string sourceCode)
         {
-            for (int i = 0; i < sourceCode.Length; i++)
+            int i = 0;
+            while (i < sourceCode.Length)
             {
+                // 'j' stands at the last correct character of a lexeme
                 int j = i;
                 char currentChar = sourceCode[i];
                 StringBuilder currentLexime = new StringBuilder(currentChar.ToString());
 
                 if (Char.IsWhiteSpace(currentChar))
+                {
+                    i++;
                     continue;
+                }
 
                 // Any letter in the english language
                 // Underscores are not allowed in tiny language
@@ -99,12 +104,15 @@ namespace JASON_Compiler
                         }
                         else
                         {
+                            // incorrect character, trace back
+                            j--;
                             break;
                         }
                     }
 
+                    // go to the next lexeme
+                    i = j + 1;
                     FindTokenClass(currentLexime.ToString());
-                    i = j - 1;
                 }
 
                 // Any digit
@@ -119,12 +127,15 @@ namespace JASON_Compiler
                         }
                         else
                         {
+                            // incorrect character, trace back
+                            j--;
                             break;
                         }
                     }
 
+                    // go to the next lexeme
+                    i = j + 1;
                     FindTokenClass(currentLexime.ToString());
-                    i = j - 1;
                 }
 
                 else if (currentChar == '"')
@@ -143,8 +154,12 @@ namespace JASON_Compiler
                         }
                     }
 
+                    /*
+                     * j stands at the last quotation mark character
+                     * go to the next character
+                     */
+                    i = j + 1;
                     FindTokenClass(currentLexime.ToString());
-                    i = j;
                 }
 
                 else if (currentChar == '/')
@@ -165,27 +180,30 @@ namespace JASON_Compiler
                                 break;
                             }
                         }
-                        i = j; // Skip the whole comment
+                        i = j + 1; // Skip the whole comment
                     }
                     else // 2. If it's NOT a comment, it MUST be division!
                     {
                         FindTokenClass("/");
-                        // we don't change 'i' here. The outer loop will naturally increment it.
+                        i = j + 1;
                     }
                 }
 
                 else if (Char.IsSymbol(currentChar) || Char.IsPunctuation(currentChar))
                 {
-                    if (i + 1 < sourceCode.Length)
+                    if (j + 1 < sourceCode.Length)
                     {
-                        string possibleOperator = currentChar.ToString() + sourceCode[i+1].ToString();
+                        string possibleOperator = currentChar.ToString() + sourceCode[j+1].ToString();
                         if (Operators.ContainsKey(possibleOperator))
                         {
+                            // Move from the two-character operator
+                            i = j + 2;
                             FindTokenClass(possibleOperator);
-                            i = i + 1;
                             continue;
                         }
                     }
+                    // Move from the one-character operator 
+                    i = j + 1;
                     FindTokenClass(currentChar.ToString());
                 }
 

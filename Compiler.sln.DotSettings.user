@@ -1,7 +1,15 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ALateBoundTestFramework_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FSourcesCache_003Fcffa676d9bfc6c7a1c9d0d25ead15b3b0c9e12e3187bf397eaa52260e5fd91_003FLateBoundTestFramework_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ARegex_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F4a775d5465684ed59d37f7afb233fa8ff98b0_003F93_003F6e4e82b4_003FRegex_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AString_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F24372012c6c94138bf3f496e104366ffc8f918_003F81_003Fa81eb530_003FString_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=cc5659dc_002D8f30_002D4dfa_002D8c96_002D54792717a348/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="TestBasicCode" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=139ce330_002Dfbbc_002D4989_002Db96d_002D1d0c127f0460/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="ScannerTester" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::760C0385-DCEF-46BF-8B21-84250E8E7F69::.NETFramework,Version=v4.8::Compiler.Tests.ScannerTester&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::760C0385-DCEF-46BF-8B21-84250E8E7F69::.NETFramework,Version=v4.8::Compiler.Tests.RegexTester&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::760C0385-DCEF-46BF-8B21-84250E8E7F69::.NETFramework,Version=v4.8::Compiler.Tests.IntegratedTester&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=cc5659dc_002D8f30_002D4dfa_002D8c96_002D54792717a348/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="TestBasicCode" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::760C0385-DCEF-46BF-8B21-84250E8E7F69::.NETFramework,Version=v4.8::Compiler.Tests.IntegratedTester.TestBasicCode&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::760C0385-DCEF-46BF-8B21-84250E8E7F69::.NETFramework,Version=v4.8::Compiler.Tests.IntegratedTester.TestComments&lt;/TestId&gt;&#xD;
@@ -16,8 +24,5 @@
 	
 	
 	
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=fbd1f9c2_002Da72e_002D4f69_002D979d_002Df6eef2ac7f5f/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="TestNumbers" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::760C0385-DCEF-46BF-8B21-84250E8E7F69::.NETFramework,Version=v4.8::Compiler.Tests.IntegratedTester.TestNumbers&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
+	
+	</wpf:ResourceDictionary>
