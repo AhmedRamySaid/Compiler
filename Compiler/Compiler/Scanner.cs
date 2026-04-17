@@ -14,7 +14,7 @@ public enum Token_Class
     INT_LITERAL_T, FLOAT_LITERAL_T, STRING_LITERAL_T, IDENTIFIER_T,
     PLUS_T, MINUS_T, MULTIPLY_T, DIVIDE_T, ASSIGN_T, LESS_THAN_T, GREATER_THAN_T,
     EQUAL_T, NOT_EQUAL_T, LOGIC_AND_T, LOGIC_OR_T, 
-    L_CURLY_BRACKET_T, R_CURLY_BRACKET_T, L_PAREN_BRACKET_T, R_PAREN_BRACKET_T, SEMICOLON_T,
+    L_CURLY_BRACKET_T, R_CURLY_BRACKET_T, L_PAREN_BRACKET_T, R_PAREN_BRACKET_T, SEMICOLON_T,COMMA_T
 }
 
 namespace JASON_Compiler
@@ -73,6 +73,7 @@ namespace JASON_Compiler
             Operators.Add("(", Token_Class.L_PAREN_BRACKET_T);
             Operators.Add(")", Token_Class.R_PAREN_BRACKET_T);
             Operators.Add(";", Token_Class.SEMICOLON_T);
+            Operators.Add(",", Token_Class.COMMA_T);
         }
 
         public void StartScanning(string sourceCode)
