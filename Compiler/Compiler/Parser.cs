@@ -30,6 +30,8 @@ namespace JASON_Compiler
             root = Program();
             return root;
         }
+
+        //********************E. Program Structure & Functions**********************\\
         Node Program()
         {
             Node program = new Node("Program");
@@ -161,6 +163,80 @@ namespace JASON_Compiler
             return null;
         }
 
+        //*****************************D. Control Flow*****************************\\
+        Node IF_Statement() {
+            Node IF_Statement_N = new Node("IF_Statement");
+            IF_Statement_N.Children.Add(match(Token_Class.IF_T));
+            IF_Statement_N.Children.Add(Condition_Statement());
+            IF_Statement_N.Children.Add(match(Token_Class.THEN_T));
+            IF_Statement_N.Children.Add(Statements());
+            IF_Statement_N.Children.Add(E_Statement());
+
+            return IF_Statement_N;
+        }
+
+        Node E_Statement(){
+            Node E_Statement_N = new Node("E_Statement");
+            Token_Class token = TokenStream[InputPointer].token_type; //dont consume the token yet
+
+            if (token == Token_Class.ELSEIF_T) {
+                E_Statement_N.Children.Add(Else_If_Statement());
+            }
+            else if (token == Token_Class.ELSE_T) {
+                E_Statement_N.Children.Add(Else_Statement());
+            }
+            else{
+                E_Statement_N.Children.Add(match(Token_Class.END_T)); //if its not any of the above then it must be an End
+            }
+
+            return E_Statement_N;
+        }
+
+        Node Else_If_Statement() {
+            Token_Class token = TokenStream[InputPointer].token_type;
+            if(token == Token_Class.ELSEIF_T) {
+                //then its an else if statment
+                Node Else_If_Statement_N = new Node("Else_If_Statement");
+                Else_If_Statement_N.Children.Add(match(Token_Class.ELSEIF_T));
+                Else_If_Statement_N.Children.Add(Condition_Statement());
+                Else_If_Statement_N.Children.Add(match(Token_Class.THEN_T));
+                Else_If_Statement_N.Children.Add(Statements());
+                Else_If_Statement_N.Children.Add(E_Statement());
+
+                return Else_If_Statement_N;
+            }
+            return null;
+        }
+
+        Node Else_Statement() {
+            Token_Class token = TokenStream[InputPointer].token_type;
+            if (token == Token_Class.ELSE_T) {
+                Node Else_Statement_N = new Node("Else_Statement");
+                Else_Statement_N.Children.Add(match(Token_Class.ELSE_T));
+                Else_Statement_N.Children.Add(Statements());
+                Else_Statement_N.Children.Add(match(Token_Class.END_T));
+
+                return Else_Statement_N;
+            }
+            return null;
+        }
+
+        Node Repeat_Statement() {
+            Token_Class token = TokenStream[InputPointer].token_type;
+            if (token == Token_Class.REPEAT_T) {
+                Node Repeat_Statement_N = new Node("Repeat_Statement");
+                Repeat_Statement_N.Children.Add(match(Token_Class.REPEAT_T));
+                Repeat_Statement_N.Children.Add(Statements());
+                Repeat_Statement_N.Children.Add(match(Token_Class.UNTIL_T));
+                Repeat_Statement_N.Children.Add(Condition_Statement());
+
+                return Repeat_Statement_N;
+            }
+            return null;
+        }
+
+
+        //****************************C. Block Logic & Statements**********************\\
         Node Statements() {
             Node Statements_N = new Node("Statements");
             //implement it 
@@ -173,6 +249,19 @@ namespace JASON_Compiler
             return Return_Statement_N;
         }
 
+
+
+        //************************B. Boolean Logic & Conditions*********************\\
+
+        Node Condition_Statement() {
+            Node Condition_Statement_N = new Node("Condition_Statement");
+
+            return Condition_Statement_N;
+        }
+
+
+
+        //*************shared functions************\\
 
         public Node match(Token_Class ExpectedToken)
         {
