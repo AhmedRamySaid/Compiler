@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Compiler\Errors.cs" />
     <Compile Include="Compiler\JASON_Compiler.cs" />
+    <Compile Include="Compiler\Parser.cs" />
     <Compile Include="Compiler\Scanner.cs" />
     <Compile Include="Forms\Form1.cs">
       <SubType>Form</SubType>

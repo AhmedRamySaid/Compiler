@@ -42,6 +42,7 @@ namespace JASON_Compiler
 
         public Scanner()
         {
+            ReservedWords.Add("main", Token_Class.MAIN_T); //MAIN_T logic 
             ReservedWords.Add("int", Token_Class.INT_T);
             ReservedWords.Add("float", Token_Class.FLOAT_T);
             ReservedWords.Add("string", Token_Class.STRING_T);
