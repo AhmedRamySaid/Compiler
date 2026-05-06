@@ -175,18 +175,29 @@ namespace JASON_Compiler
             return IF_Statement_N;
         }
 
-        Node E_Statement(){
+        Node E_Statement()
+        {
             Node E_Statement_N = new Node("E_Statement");
-            Token_Class token = TokenStream[InputPointer].token_type; //dont consume the token yet
-
-            if (token == Token_Class.ELSEIF_T) {
-                E_Statement_N.Children.Add(Else_If_Statement());
+            if (InputPointer < TokenStream.Count)
+            {
+                Token_Class token = TokenStream[InputPointer].token_type;
+                if (token == Token_Class.ELSEIF_T)
+                {
+                    E_Statement_N.Children.Add(Else_If_Statement());
+                }
+                else if (token == Token_Class.ELSE_T)
+                {
+                    E_Statement_N.Children.Add(Else_Statement());
+                }
+                else
+                {
+                    E_Statement_N.Children.Add(match(Token_Class.END_T));
+                }
             }
-            else if (token == Token_Class.ELSE_T) {
-                E_Statement_N.Children.Add(Else_Statement());
-            }
-            else{
-                E_Statement_N.Children.Add(match(Token_Class.END_T)); //if its not any of the above then it must be an End
+            else
+            {
+                //if end of file reached
+                Errors.Error_List.Add("Parsing Error: Expected elseif, else, or end, but reached end of file.\r\n");
             }
 
             return E_Statement_N;
@@ -236,17 +247,211 @@ namespace JASON_Compiler
         }
 
 
-        //****************************C. Block Logic & Statements**********************\\
+        //******************************C. Block Logic & Statements**********************\\
         Node Statements() {
-            Node Statements_N = new Node("Statements");
-            //implement it 
-            return Statements_N;
+
+            Node firstStatement = Statement();
+            if (firstStatement != null) {
+                Node Statements_N = new Node("Statements");
+                Statements_N.Children.Add(firstStatement);
+
+                Node nextStatements = Statements();
+                if (nextStatements != null)
+                {
+                    Statements_N.Children.Add(nextStatements);
+                }
+
+                return Statements_N;
+            }
+            return null; //epsilon path 
         }
 
+        Node Statement(){
+            if (InputPointer < TokenStream.Count) {
+                Token_Class token = TokenStream[InputPointer].token_type;
+                if (token == Token_Class.INT_T || token == Token_Class.FLOAT_T || token == Token_Class.STRING_T) {
+                    return Dec_Statement(); //is it a declaation statement
+                }
+                else if (token == Token_Class.WRITE_T){ //if its a write statement
+                    return Write_Statement();
+                }
+                else if (token == Token_Class.READ_T){
+                    return Read_Statement(); //if its a read statement
+                }
+                else if (token == Token_Class.RETURN_T){
+                    return Return_Statement(); //if its a return statement
+                }
+                else if (token == Token_Class.IF_T){
+                    return IF_Statement(); //if its an if statement
+                }
+                else if (token == Token_Class.REPEAT_T){
+                    return Repeat_Statement(); //if its a repeat statement
+                }
+                else if (token == Token_Class.IDENTIFIER_T) { //check if its a function statement
+                    if (InputPointer + 1 < TokenStream.Count)
+                    {
+                        Token_Class nextToken = TokenStream[InputPointer + 1].token_type;
+                        if (nextToken == Token_Class.ASSIGN_T) //identifier + Assign_T then its an assignement
+                        {
+                            return Assign_Statement();
+                        }
+                        else if (nextToken == Token_Class.L_PAREN_BRACKET_T) //if i have an identifier token  then left bracket then its a function call statement
+                        { 
+                            return Function_Call_Statement();
+                        }
+                    }
+                }
+            }
+            return null; //epsilon path
+        }
+
+        Node Assign_Statement() {
+            if (InputPointer < TokenStream.Count && (InputPointer+1) < TokenStream.Count) {
+                Token_Class token_2 = TokenStream[InputPointer+1].token_type;
+                if (token_2 == Token_Class.ASSIGN_T) { //then its an assign statement
+                    Node Assign_Statement_N = new Node("Assign_Statement");
+                    Assign_Statement_N.Children.Add(match(Token_Class.IDENTIFIER_T));
+                    Assign_Statement_N.Children.Add(match(Token_Class.ASSIGN_T));
+                    Assign_Statement_N.Children.Add(Expression());
+                    Assign_Statement_N.Children.Add(match(Token_Class.SEMICOLON_T));
+
+                    return Assign_Statement_N;
+                }
+            }
+            return null;
+        }
+
+        Node Dec_Statement() {
+            if (InputPointer < TokenStream.Count) {
+                Token_Class token = TokenStream[InputPointer].token_type;
+                //notice i cant use Datatype in here because it consumes the token and i just want to peak
+                if (token == Token_Class.INT_T || token == Token_Class.FLOAT_T || token == Token_Class.STRING_T) {
+                    Node Dec_Statement_N = new Node("Dec_Statement");
+                    Dec_Statement_N.Children.Add(Datatype()); //consume the datatype
+                    Dec_Statement_N.Children.Add(Single_Ident());
+                    Dec_Statement_N.Children.Add(match(Token_Class.SEMICOLON_T));
+
+                    return Dec_Statement_N;
+                }
+            }
+            return null; //epsilon path
+        }
+        Node Single_Ident(){
+            Node Single_Ident_N = new Node("Single_Ident");
+
+            Single_Ident_N.Children.Add(Ident_Item());
+            Node commaNode = Comma_Ident(); //check if its not an epsilon
+            if (commaNode != null) {
+                Single_Ident_N.Children.Add(commaNode);
+            }
+            return Single_Ident_N;
+        }
+        Node Ident_Item() {
+            Node Ident_Item_N = new Node("Ident_Item");
+
+            Ident_Item_N.Children.Add(match(Token_Class.IDENTIFIER_T));
+            Node trailNode = Ident_Item_Trail(); //Ident_Item_Trail could be an epsilon
+            if (trailNode != null){
+                Ident_Item_N.Children.Add(trailNode);
+            }
+            return Ident_Item_N;
+        }
+        Node Ident_Item_Trail(){
+
+            if (InputPointer < TokenStream.Count){
+                Token_Class token = TokenStream[InputPointer].token_type;
+                if (token == Token_Class.ASSIGN_T){
+                    Node Ident_Item_Trail_N = new Node("Ident_Item_Trail");
+                    Ident_Item_Trail_N.Children.Add(match(Token_Class.ASSIGN_T));
+                    Ident_Item_Trail_N.Children.Add(Expression()); // Assumes you have Expression() implemented
+
+                    return Ident_Item_Trail_N;
+                }
+            }
+            return null; //epsilon path
+        }
+        Node Comma_Ident(){
+            if (InputPointer < TokenStream.Count){
+                Token_Class token = TokenStream[InputPointer].token_type;
+                if (token == Token_Class.COMMA_T){
+
+                    Node Comma_Ident_N = new Node("Comma_Ident");
+                    Comma_Ident_N.Children.Add(match(Token_Class.COMMA_T));
+                    Comma_Ident_N.Children.Add(Ident_Item());
+
+                    Node nextCommaNode = Comma_Ident(); //call itself recursevly again
+                    if (nextCommaNode != null){
+                        Comma_Ident_N.Children.Add(nextCommaNode);
+                    }
+
+                    return Comma_Ident_N;
+                }
+            }
+            return null; //epsilon path
+        }
+
+        Node Write_Statement() {
+            if (InputPointer < TokenStream.Count) {
+                Token_Class token = TokenStream[InputPointer].token_type;
+                if (token == Token_Class.WRITE_T){
+                    Node Write_Statement_N = new Node("Write_Statement");
+                    Write_Statement_N.Children.Add(match(Token_Class.WRITE_T));
+                    Write_Statement_N.Children.Add(Opt_Exp());
+                    Write_Statement_N.Children.Add(match(Token_Class.SEMICOLON_T));
+
+                    return Write_Statement_N;
+                }
+            }
+            return null;
+        }
+        Node Opt_Exp() {
+            Node Opt_Exp_N = new Node("Opt_Exp"); //there should be something to be returned anyways
+            if (InputPointer < TokenStream.Count) {
+                Token_Class token = TokenStream[InputPointer].token_type;
+
+                if (token == Token_Class.ENDL_T) { //check if its an endl
+                    Opt_Exp_N.Children.Add(match(Token_Class.ENDL_T));
+                }
+                else{ //if not and endl then it must be an expression
+                    Opt_Exp_N.Children.Add(Expression());
+                }
+            }
+            return Opt_Exp_N;
+        }
+        Node Read_Statement() {
+            if (InputPointer < TokenStream.Count) {
+                Token_Class token = TokenStream[InputPointer].token_type;
+                if (token == Token_Class.READ_T) { //its a read statement
+                    Node Read_Statement_N = new Node("Read_Statement");
+                    Read_Statement_N.Children.Add(match(Token_Class.READ_T));
+                    Read_Statement_N.Children.Add(match(Token_Class.IDENTIFIER_T));
+                    Read_Statement_N.Children.Add(match(Token_Class.SEMICOLON_T));
+                    return Read_Statement_N;
+                }
+            }
+            return null;
+        }
+        Node Function_Call_Statement() {
+        //i should make get a unique thing to check on and be sure its a Function_Call_Statement or i return null
+            Node Function_Call_Statement_N = new Node("Function_Call_Statement");
+            Function_Call_Statement_N.Children.Add(Function_Call());
+            Function_Call_Statement_N.Children.Add(match(Token_Class.SEMICOLON_T));
+            return Function_Call_Statement_N;
+        }
         Node Return_Statement() {
-            Node Return_Statement_N = new Node("Return_Statement");
-            //implement it 
-            return Return_Statement_N;
+            if (InputPointer < TokenStream.Count)
+            {
+                Token_Class token = TokenStream[InputPointer].token_type;
+                if (token == Token_Class.RETURN_T)
+                { //its a return statement
+                    Node Return_Statement_N = new Node("Return_Statement");
+                    Return_Statement_N.Children.Add(match(Token_Class.RETURN_T));
+                    Return_Statement_N.Children.Add(Expression());
+                    Return_Statement_N.Children.Add(match(Token_Class.SEMICOLON_T));
+                    return Return_Statement_N;
+                }
+            }
+            return null;
         }
 
 
@@ -255,10 +460,23 @@ namespace JASON_Compiler
 
         Node Condition_Statement() {
             Node Condition_Statement_N = new Node("Condition_Statement");
-
+            //implement it
             return Condition_Statement_N;
         }
 
+
+        //************************A. Mathematical Expressions & Strings****************\\
+        Node Expression() {
+            Node Expression_N = new Node("Expression");
+            //implement it
+            return Expression_N;
+        }
+
+        Node Function_Call() {
+            Node Function_Call_N = new Node("Function_Call");
+            //implement it
+            return Function_Call_N;
+        }
 
 
         //*************shared functions************\\
