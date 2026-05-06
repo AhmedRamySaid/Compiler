@@ -175,27 +175,21 @@ namespace JASON_Compiler
             return IF_Statement_N;
         }
 
-        Node E_Statement()
-        {
+        Node E_Statement() {
             Node E_Statement_N = new Node("E_Statement");
-            if (InputPointer < TokenStream.Count)
-            {
+            if (InputPointer < TokenStream.Count) {
                 Token_Class token = TokenStream[InputPointer].token_type;
-                if (token == Token_Class.ELSEIF_T)
-                {
+                if (token == Token_Class.ELSEIF_T)  {
                     E_Statement_N.Children.Add(Else_If_Statement());
                 }
-                else if (token == Token_Class.ELSE_T)
-                {
+                else if (token == Token_Class.ELSE_T)  {
                     E_Statement_N.Children.Add(Else_Statement());
                 }
-                else
-                {
+                else{
                     E_Statement_N.Children.Add(match(Token_Class.END_T));
                 }
             }
-            else
-            {
+            else {
                 //if end of file reached
                 Errors.Error_List.Add("Parsing Error: Expected elseif, else, or end, but reached end of file.\r\n");
             }
@@ -432,9 +426,10 @@ namespace JASON_Compiler
             return null;
         }
         Node Function_Call_Statement() {
-        //i should make get a unique thing to check on and be sure its a Function_Call_Statement or i return null
+        
             Node Function_Call_Statement_N = new Node("Function_Call_Statement");
-            Function_Call_Statement_N.Children.Add(Function_Call());
+            Function_Call_Statement_N.Children.Add(match(Token_Class.IDENTIFIER_T));//eat this idiot
+            Function_Call_Statement_N.Children.Add(Function_Call_Trail());
             Function_Call_Statement_N.Children.Add(match(Token_Class.SEMICOLON_T));
             return Function_Call_Statement_N;
         }
@@ -537,16 +532,207 @@ namespace JASON_Compiler
 
         Node Expression() {
             Node Expression_N = new Node("Expression");
-            //implement it
-            return Expression_N;
+            if (InputPointer < TokenStream.Count) {
+                Token_Class token = TokenStream[InputPointer].token_type;
+                //check if its a string literal
+                if (token == Token_Class.STRING_LITERAL_T) {
+                    Expression_N.Children.Add(match(Token_Class.STRING_LITERAL_T));
+                    return Expression_N;
+                }
+                //other options: Equation or Term
+                Node parsedCore = Math_Core();
+                if (InputPointer < TokenStream.Count) {
+                    Token_Class nextToken = TokenStream[InputPointer].token_type;
+
+                    //if its a math operator, this isnt just a Term... its a full Equation!!
+                    if (nextToken == Token_Class.PLUS_T || nextToken == Token_Class.MINUS_T ||
+                        nextToken == Token_Class.MULTIPLY_T || nextToken == Token_Class.DIVIDE_T) {
+
+                        //pass our parsedCore into Equation so we dont lose it!!
+                        Expression_N.Children.Add(Equation(parsedCore));
+                        return Expression_N;
+                    }
+                } 
+                // its just a single term or a math core since there is no operators
+                Expression_N.Children.Add(parsedCore);
+                return Expression_N;
+            }
+            return null;
+        }
+        Node Equation(Node preParsed_Math_Core = null){
+            Node Equation_N = new Node("Equation");
+            if (preParsed_Math_Core != null){
+                //already parsed it in Expression() so we just pass it to here and attach it 
+                Equation_N.Children.Add(preParsed_Math_Core);
+            }
+            else {
+                //else its a new bracket
+                Equation_N.Children.Add(Math_Core());
+            }
+            //we must have another term after the arith operator 
+            Equation_N.Children.Add(Arith_Operator());
+            Equation_N.Children.Add(Math_Core());
+
+            Node trailNode = E_Trail();
+            if (trailNode != null)
+            {
+                Equation_N.Children.Add(trailNode);
+            }
+
+            return Equation_N;
+        }
+        Node Arith_Operator() {
+            Node Arith_Operator_N = new Node("Arith-Operator");
+            if (InputPointer < TokenStream.Count)
+            {
+                Token_Class token = TokenStream[InputPointer].token_type;
+
+                if (token == Token_Class.PLUS_T || token == Token_Class.MINUS_T ||
+                    token == Token_Class.MULTIPLY_T || token == Token_Class.DIVIDE_T) {
+                    Arith_Operator_N.Children.Add(match(token));
+                    return Arith_Operator_N;
+                }
+            }
+            return null;
+        }
+        Node Math_Core() {
+            Node Math_Core_N = new Node("Math_Core");
+            if (InputPointer < TokenStream.Count) {
+                Token_Class token = TokenStream[InputPointer].token_type;
+
+                if (token == Token_Class.L_PAREN_BRACKET_T) { //if its a left parantethesis then the other option
+                    Math_Core_N.Children.Add(match(Token_Class.L_PAREN_BRACKET_T));
+                    Math_Core_N.Children.Add(Equation()); // Safely parses inner equation
+                    Math_Core_N.Children.Add(match(Token_Class.R_PAREN_BRACKET_T));
+                    return Math_Core_N;
+                }
+                else { //if its not a left paren then it must be a term
+                    Node termNode = Term(); 
+                    if (termNode != null) {
+                        Math_Core_N.Children.Add(termNode);
+                        return Math_Core_N;
+                    }
+                }
+            }
+            return null;
         }
 
-        Node Function_Call() {
+        Node E_Trail() {
+            if (InputPointer < TokenStream.Count){
+                Token_Class token = TokenStream[InputPointer].token_type;
+                //if its a math operator then we are good...not the epsilon path
+                if (token == Token_Class.PLUS_T || token == Token_Class.MINUS_T ||
+                    token == Token_Class.MULTIPLY_T || token == Token_Class.DIVIDE_T) {
+
+                    Node E_Trail_N = new Node("E_Trail");
+                    E_Trail_N.Children.Add(Arith_Operator());
+                    E_Trail_N.Children.Add(Math_Core());
+
+                    Node nextTrail = E_Trail();//recursive call
+                    if (nextTrail != null){
+                        E_Trail_N.Children.Add(nextTrail);
+                    }
+                    return E_Trail_N;
+                }
+            }
+            //epsilon path
+            return null;
+        }
+        Node Function_Call_Trail() {
             Node Function_Call_N = new Node("Function_Call");
-            //implement it
+
+            Function_Call_N.Children.Add(match(Token_Class.L_PAREN_BRACKET_T));
+            Node argsNode = Args();
+            if (argsNode != null) {
+                Function_Call_N.Children.Add(argsNode);
+            }
+            Function_Call_N.Children.Add(match(Token_Class.R_PAREN_BRACKET_T));
             return Function_Call_N;
         }
-        Node Term() { 
+        Node Args(){
+            if (InputPointer < TokenStream.Count) {
+                Token_Class token = TokenStream[InputPointer].token_type;
+                if (token == Token_Class.R_PAREN_BRACKET_T) { //if its a right bracket then no another arg
+                    return null;
+                } //else its an expression
+                Node Args_N = new Node("Args");
+                Args_N.Children.Add(Expression()); 
+
+                Node commaArgNode = Comma_Arg();//check for more args
+                if (commaArgNode != null) {
+                    Args_N.Children.Add(commaArgNode);
+                }
+                return Args_N;
+            }
+            return null;
+        }
+        Node Comma_Arg() {
+            if (InputPointer < TokenStream.Count) {
+                Token_Class token = TokenStream[InputPointer].token_type;
+                if (token == Token_Class.COMMA_T) {
+                    Node Comma_Arg_N = new Node("Comma_Arg");
+
+                    Comma_Arg_N.Children.Add(match(Token_Class.COMMA_T));
+                    Comma_Arg_N.Children.Add(Expression());
+                    Node nextCommaArg = Comma_Arg(); //recursive call
+                    if (nextCommaArg != null) {
+                        Comma_Arg_N.Children.Add(nextCommaArg);
+                    }
+                    return Comma_Arg_N;
+                }
+            }
+            return null; //epsilon path
+        }
+
+        Node Term() {
+            if (InputPointer < TokenStream.Count) {
+                Token_Class token = TokenStream[InputPointer].token_type;
+                //check if its a Number_Literal
+                if (token == Token_Class.INT_LITERAL_T || token == Token_Class.FLOAT_LITERAL_T) {
+                    Node Term_N = new Node("Term");
+                    Term_N.Children.Add(Number_Literal());
+                    return Term_N;
+                }
+                //check if its an identifier then its supposed to be a Term_trail...(either just a variable or a function call)
+                else if (token == Token_Class.IDENTIFIER_T) {
+                    Node Term_N = new Node("Term");
+                    Term_N.Children.Add(match(Token_Class.IDENTIFIER_T));
+
+                    Node trailNode = Term_Trail();
+                    if (trailNode != null) {
+                        Term_N.Children.Add(trailNode);
+                    }
+                    return Term_N;
+                }
+            }
+            return null;
+        }
+        Node Number_Literal() {
+            if (InputPointer < TokenStream.Count)
+            {
+                Token_Class token = TokenStream[InputPointer].token_type;
+                if (token == Token_Class.INT_LITERAL_T || token == Token_Class.FLOAT_LITERAL_T)
+                {
+                    Node Number_Literal_N = new Node("Number_Literal");
+                    Number_Literal_N.Children.Add(match(token));
+                    return Number_Literal_N;
+                }
+            }
+            else { //reached end of tokens 
+                Errors.Error_List.Add("Parsing Error: Expected INT_LITERAL_T or FLOAT_LITERAL_T but reached end of file.\r\n");
+            }
+            return null;
+        }
+        Node Term_Trail() {
+            if (InputPointer < TokenStream.Count) {
+                Token_Class token = TokenStream[InputPointer].token_type;
+                if (token == Token_Class.L_PAREN_BRACKET_T) {
+                    Node Term_Trail_N = new Node("Term_Trail");
+                    Term_Trail_N.Children.Add(Function_Call_Trail());
+                    return Term_Trail_N;
+                }
+            }
+            return null; //epsilon path
         }
 
         //*************shared functions************\\
