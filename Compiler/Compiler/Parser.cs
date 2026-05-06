@@ -19,8 +19,8 @@ namespace JASON_Compiler
     }
     public class Parser
     {
-        int InputPointer = 0;
-        List<Token> TokenStream;
+        public int InputPointer = 0;
+       public  List<Token> TokenStream;
         public  Node root;
         
         public Node StartParsing(List<Token> TokenStream)
@@ -30,9 +30,16 @@ namespace JASON_Compiler
             root = Program();
             return root;
         }
+        //just for testing
+        public void InitializeForTest(List<Token> tokens)
+        {
+            TokenStream = tokens;
+            InputPointer = 0;
+            Errors.Error_List.Clear(); // Clear any previous errors
+        }
 
         //********************E. Program Structure & Functions**********************\\
-        Node Program()
+        public Node Program()
         {
             Node program = new Node("Program");
             program.Children.Add(Pre_Program_statements());
@@ -40,7 +47,7 @@ namespace JASON_Compiler
             MessageBox.Show("Success");
             return program;
         }
-        Node Pre_Program_statements() {
+        public Node Pre_Program_statements() {
             //i should first check whether this is a main function or just a normal function
             if (InputPointer + 1 < TokenStream.Count) {
                 if (TokenStream[InputPointer + 1].token_type == Token_Class.IDENTIFIER_T)
@@ -58,7 +65,7 @@ namespace JASON_Compiler
             return null; //epsilon path
         }
 
-        Node Main_Function() {
+        public Node Main_Function() {
             Node Main_Function_N = new Node("Main-Function");
 
             Main_Function_N.Children.Add(Datatype());
@@ -69,7 +76,7 @@ namespace JASON_Compiler
 
             return Main_Function_N;
         }
-        Node Datatype() {
+        public Node Datatype() {
             Node Datatype_N = new Node("Datatype");
 
             if (InputPointer < this.TokenStream.Count) { //check if iam not going out of bound
@@ -95,7 +102,7 @@ namespace JASON_Compiler
             }
                 return Datatype_N;    
         }
-        Node Function_Body() {
+        public Node Function_Body() {
             Node Function_Body_N = new Node("Function-body");
             Function_Body_N.Children.Add(match(Token_Class.L_CURLY_BRACKET_T));
             Function_Body_N.Children.Add(Statements()); //implement it 
@@ -103,13 +110,13 @@ namespace JASON_Compiler
             Function_Body_N.Children.Add(match(Token_Class.R_CURLY_BRACKET_T));
             return Function_Body_N;
         }
-        Node Function_Statement() {
+        public Node Function_Statement() {
             Node Function_Statement_N = new Node("Function-Statement");
             Function_Statement_N.Children.Add(Function_Declaration());
             Function_Statement_N.Children.Add(Function_Body());
             return Function_Statement_N;
         }
-        Node Function_Declaration() {
+        public Node Function_Declaration() {
             Node Function_Declaration_N = new Node("Function-Declaration");
 
             Function_Declaration_N.Children.Add(Datatype());
@@ -123,7 +130,7 @@ namespace JASON_Compiler
 
             return Function_Declaration_N;
         }
-        Node Params() {
+        public Node Params() {
             Node Params_N = new Node("Params");
 
             if (InputPointer < TokenStream.Count) {
@@ -138,13 +145,13 @@ namespace JASON_Compiler
             //epsilon path so we dont cluter the tree even if its not gonna be printed later
             return null;
         }
-        Node Parameter() {
+        public Node Parameter() {
             Node Parameter_N = new Node("Parameter");
             Parameter_N.Children.Add(Datatype());
             Parameter_N.Children.Add(match(Token_Class.IDENTIFIER_T));
             return Parameter_N;
         }
-        Node Comma_Param() {
+        public Node Comma_Param() {
             Node Comma_Param_N = new Node("Comma_Param");
             if (InputPointer < this.TokenStream.Count && this.TokenStream[InputPointer].token_type == Token_Class.COMMA_T)
             {
@@ -164,7 +171,7 @@ namespace JASON_Compiler
         }
 
         //*****************************D. Control Flow*****************************\\
-        Node IF_Statement() {
+        public Node IF_Statement() {
             Node IF_Statement_N = new Node("IF_Statement");
             IF_Statement_N.Children.Add(match(Token_Class.IF_T));
             IF_Statement_N.Children.Add(Condition_Statement());
@@ -175,7 +182,7 @@ namespace JASON_Compiler
             return IF_Statement_N;
         }
 
-        Node E_Statement() {
+        public Node E_Statement() {
             Node E_Statement_N = new Node("E_Statement");
             if (InputPointer < TokenStream.Count) {
                 Token_Class token = TokenStream[InputPointer].token_type;
@@ -197,7 +204,7 @@ namespace JASON_Compiler
             return E_Statement_N;
         }
 
-        Node Else_If_Statement() {
+        public Node Else_If_Statement() {
             Token_Class token = TokenStream[InputPointer].token_type;
             if(token == Token_Class.ELSEIF_T) {
                 //then its an else if statment
@@ -213,7 +220,7 @@ namespace JASON_Compiler
             return null;
         }
 
-        Node Else_Statement() {
+        public Node Else_Statement() {
             Token_Class token = TokenStream[InputPointer].token_type;
             if (token == Token_Class.ELSE_T) {
                 Node Else_Statement_N = new Node("Else_Statement");
@@ -226,7 +233,7 @@ namespace JASON_Compiler
             return null;
         }
 
-        Node Repeat_Statement() {
+        public Node Repeat_Statement() {
             Token_Class token = TokenStream[InputPointer].token_type;
             if (token == Token_Class.REPEAT_T) {
                 Node Repeat_Statement_N = new Node("Repeat_Statement");
@@ -242,7 +249,7 @@ namespace JASON_Compiler
 
 
         //******************************C. Block Logic & Statements**********************\\
-        Node Statements() {
+        public Node Statements() {
 
             Node firstStatement = Statement();
             if (firstStatement != null) {
@@ -260,7 +267,7 @@ namespace JASON_Compiler
             return null; //epsilon path 
         }
 
-        Node Statement(){
+        public Node Statement(){
             if (InputPointer < TokenStream.Count) {
                 Token_Class token = TokenStream[InputPointer].token_type;
                 if (token == Token_Class.INT_T || token == Token_Class.FLOAT_T || token == Token_Class.STRING_T) {
@@ -299,7 +306,7 @@ namespace JASON_Compiler
             return null; //epsilon path
         }
 
-        Node Assign_Statement() {
+        public Node Assign_Statement() {
             if (InputPointer < TokenStream.Count && (InputPointer+1) < TokenStream.Count) {
                 Token_Class token_2 = TokenStream[InputPointer+1].token_type;
                 if (token_2 == Token_Class.ASSIGN_T) { //then its an assign statement
@@ -315,7 +322,7 @@ namespace JASON_Compiler
             return null;
         }
 
-        Node Dec_Statement() {
+        public Node Dec_Statement() {
             if (InputPointer < TokenStream.Count) {
                 Token_Class token = TokenStream[InputPointer].token_type;
                 //notice i cant use Datatype in here because it consumes the token and i just want to peak
@@ -330,7 +337,7 @@ namespace JASON_Compiler
             }
             return null; //epsilon path
         }
-        Node Single_Ident(){
+        public Node Single_Ident(){
             Node Single_Ident_N = new Node("Single_Ident");
 
             Single_Ident_N.Children.Add(Ident_Item());
@@ -340,7 +347,7 @@ namespace JASON_Compiler
             }
             return Single_Ident_N;
         }
-        Node Ident_Item() {
+        public Node Ident_Item() {
             Node Ident_Item_N = new Node("Ident_Item");
 
             Ident_Item_N.Children.Add(match(Token_Class.IDENTIFIER_T));
@@ -350,7 +357,7 @@ namespace JASON_Compiler
             }
             return Ident_Item_N;
         }
-        Node Ident_Item_Trail(){
+        public Node Ident_Item_Trail(){
 
             if (InputPointer < TokenStream.Count){
                 Token_Class token = TokenStream[InputPointer].token_type;
@@ -364,7 +371,7 @@ namespace JASON_Compiler
             }
             return null; //epsilon path
         }
-        Node Comma_Ident(){
+        public  Node Comma_Ident(){
             if (InputPointer < TokenStream.Count){
                 Token_Class token = TokenStream[InputPointer].token_type;
                 if (token == Token_Class.COMMA_T){
@@ -384,7 +391,7 @@ namespace JASON_Compiler
             return null; //epsilon path
         }
 
-        Node Write_Statement() {
+        public Node Write_Statement() {
             if (InputPointer < TokenStream.Count) {
                 Token_Class token = TokenStream[InputPointer].token_type;
                 if (token == Token_Class.WRITE_T){
@@ -398,7 +405,7 @@ namespace JASON_Compiler
             }
             return null;
         }
-        Node Opt_Exp() {
+        public Node Opt_Exp() {
             Node Opt_Exp_N = new Node("Opt_Exp"); //there should be something to be returned anyways
             if (InputPointer < TokenStream.Count) {
                 Token_Class token = TokenStream[InputPointer].token_type;
@@ -412,7 +419,7 @@ namespace JASON_Compiler
             }
             return Opt_Exp_N;
         }
-        Node Read_Statement() {
+        public Node Read_Statement() {
             if (InputPointer < TokenStream.Count) {
                 Token_Class token = TokenStream[InputPointer].token_type;
                 if (token == Token_Class.READ_T) { //its a read statement
@@ -425,7 +432,7 @@ namespace JASON_Compiler
             }
             return null;
         }
-        Node Function_Call_Statement() {
+        public Node Function_Call_Statement() {
         
             Node Function_Call_Statement_N = new Node("Function_Call_Statement");
             Function_Call_Statement_N.Children.Add(match(Token_Class.IDENTIFIER_T));//eat this idiot
@@ -433,7 +440,7 @@ namespace JASON_Compiler
             Function_Call_Statement_N.Children.Add(match(Token_Class.SEMICOLON_T));
             return Function_Call_Statement_N;
         }
-        Node Return_Statement() {
+        public Node Return_Statement() {
             if (InputPointer < TokenStream.Count)
             {
                 Token_Class token = TokenStream[InputPointer].token_type;
@@ -452,7 +459,7 @@ namespace JASON_Compiler
 
 
         //************************B. Boolean Logic & Conditions*********************\\
-        Node Bool_Operator() {
+        public Node Bool_Operator() {
             Node Bool_Operator_N = new Node("Bool_Operator");
             if (InputPointer < TokenStream.Count)
             {
@@ -473,7 +480,7 @@ namespace JASON_Compiler
             }
             return Bool_Operator_N;
         }
-        Node Condition_Operator() {
+        public Node Condition_Operator() {
             Node Condition_Operator_N = new Node("Condition_Operator");
             if (InputPointer < TokenStream.Count)
             {
@@ -495,20 +502,20 @@ namespace JASON_Compiler
             }
             return Condition_Operator_N;
         }
-        Node Condition() {
+        public Node Condition() {
             Node Condition_N = new Node("Condition");
             Condition_N.Children.Add(match(Token_Class.IDENTIFIER_T));
             Condition_N.Children.Add(Condition_Operator());
             Condition_N.Children.Add(Term());
             return Condition_N;
         }
-        Node Condition_Statement() {
+        public Node Condition_Statement() {
             Node Condition_Statement_N = new Node("Condition_Statement");
             Condition_Statement_N.Children.Add(Condition());
             Condition_Statement_N.Children.Add(Bool_stat());
             return Condition_Statement_N;
         }
-        Node Bool_stat() {
+        public Node Bool_stat() {
             if (InputPointer < TokenStream.Count)
             {
                 Token_Class token = TokenStream[InputPointer].token_type;
@@ -530,7 +537,7 @@ namespace JASON_Compiler
 
         //************************A. Mathematical Expressions & Strings****************\\
 
-        Node Expression() {
+        public Node Expression() {
             Node Expression_N = new Node("Expression");
             if (InputPointer < TokenStream.Count) {
                 Token_Class token = TokenStream[InputPointer].token_type;
@@ -559,7 +566,7 @@ namespace JASON_Compiler
             }
             return null;
         }
-        Node Equation(Node preParsed_Math_Core = null){
+        public Node Equation(Node preParsed_Math_Core = null){
             Node Equation_N = new Node("Equation");
             if (preParsed_Math_Core != null){
                 //already parsed it in Expression() so we just pass it to here and attach it 
@@ -581,7 +588,7 @@ namespace JASON_Compiler
 
             return Equation_N;
         }
-        Node Arith_Operator() {
+        public Node Arith_Operator() {
             Node Arith_Operator_N = new Node("Arith-Operator");
             if (InputPointer < TokenStream.Count)
             {
@@ -595,7 +602,7 @@ namespace JASON_Compiler
             }
             return null;
         }
-        Node Math_Core() {
+       public Node Math_Core() {
             Node Math_Core_N = new Node("Math_Core");
             if (InputPointer < TokenStream.Count) {
                 Token_Class token = TokenStream[InputPointer].token_type;
@@ -617,7 +624,7 @@ namespace JASON_Compiler
             return null;
         }
 
-        Node E_Trail() {
+       public  Node E_Trail() {
             if (InputPointer < TokenStream.Count){
                 Token_Class token = TokenStream[InputPointer].token_type;
                 //if its a math operator then we are good...not the epsilon path
@@ -638,7 +645,7 @@ namespace JASON_Compiler
             //epsilon path
             return null;
         }
-        Node Function_Call_Trail() {
+        public Node Function_Call_Trail() {
             Node Function_Call_N = new Node("Function_Call");
 
             Function_Call_N.Children.Add(match(Token_Class.L_PAREN_BRACKET_T));
@@ -649,7 +656,7 @@ namespace JASON_Compiler
             Function_Call_N.Children.Add(match(Token_Class.R_PAREN_BRACKET_T));
             return Function_Call_N;
         }
-        Node Args(){
+        public Node Args(){
             if (InputPointer < TokenStream.Count) {
                 Token_Class token = TokenStream[InputPointer].token_type;
                 if (token == Token_Class.R_PAREN_BRACKET_T) { //if its a right bracket then no another arg
@@ -666,7 +673,7 @@ namespace JASON_Compiler
             }
             return null;
         }
-        Node Comma_Arg() {
+        public Node Comma_Arg() {
             if (InputPointer < TokenStream.Count) {
                 Token_Class token = TokenStream[InputPointer].token_type;
                 if (token == Token_Class.COMMA_T) {
@@ -684,7 +691,7 @@ namespace JASON_Compiler
             return null; //epsilon path
         }
 
-        Node Term() {
+        public Node Term() {
             if (InputPointer < TokenStream.Count) {
                 Token_Class token = TokenStream[InputPointer].token_type;
                 //check if its a Number_Literal
@@ -707,7 +714,7 @@ namespace JASON_Compiler
             }
             return null;
         }
-        Node Number_Literal() {
+        public Node Number_Literal() {
             if (InputPointer < TokenStream.Count)
             {
                 Token_Class token = TokenStream[InputPointer].token_type;
@@ -723,7 +730,7 @@ namespace JASON_Compiler
             }
             return null;
         }
-        Node Term_Trail() {
+        public Node Term_Trail() {
             if (InputPointer < TokenStream.Count) {
                 Token_Class token = TokenStream[InputPointer].token_type;
                 if (token == Token_Class.L_PAREN_BRACKET_T) {
