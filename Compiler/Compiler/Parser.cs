@@ -457,15 +457,84 @@ namespace JASON_Compiler
 
 
         //************************B. Boolean Logic & Conditions*********************\\
-
+        Node Bool_Operator() {
+            Node Bool_Operator_N = new Node("Bool_Operator");
+            if (InputPointer < TokenStream.Count)
+            {
+                Token_Class token = TokenStream[InputPointer].token_type;
+                if (token == Token_Class.LOGIC_AND_T)
+                {
+                    Bool_Operator_N.Children.Add(match(Token_Class.LOGIC_AND_T));
+                }
+                else if (token == Token_Class.LOGIC_OR_T)
+                {
+                    Bool_Operator_N.Children.Add(match(Token_Class.LOGIC_OR_T));
+                }
+                else {
+                    //catch and consume if its not a real bool operator token
+                    Errors.Error_List.Add($"Parsing Error: Expected Boolean Operator (&&, ||) but found {token} \r\n");
+                    InputPointer++;
+                }
+            }
+            return Bool_Operator_N;
+        }
+        Node Condition_Operator() {
+            Node Condition_Operator_N = new Node("Condition_Operator");
+            if (InputPointer < TokenStream.Count)
+            {
+                Token_Class token = TokenStream[InputPointer].token_type;
+                switch (token) {
+                    case Token_Class.LESS_THAN_T:
+                    case Token_Class.GREATER_THAN_T:
+                    case Token_Class.EQUAL_T:
+                    case Token_Class.NOT_EQUAL_T:
+                        //all use the same line
+                        Condition_Operator_N.Children.Add(match(token));
+                        break;
+                    default:
+                        //error catch
+                        Errors.Error_List.Add($"Parsing Error: Expected Condition Operator (<, >, =, !=) but found {token} \r\n");
+                        InputPointer++; //consume the wrong token
+                        break;
+                }
+            }
+            return Condition_Operator_N;
+        }
+        Node Condition() {
+            Node Condition_N = new Node("Condition");
+            Condition_N.Children.Add(match(Token_Class.IDENTIFIER_T));
+            Condition_N.Children.Add(Condition_Operator());
+            Condition_N.Children.Add(Term());
+            return Condition_N;
+        }
         Node Condition_Statement() {
             Node Condition_Statement_N = new Node("Condition_Statement");
-            //implement it
+            Condition_Statement_N.Children.Add(Condition());
+            Condition_Statement_N.Children.Add(Bool_stat());
             return Condition_Statement_N;
         }
+        Node Bool_stat() {
+            if (InputPointer < TokenStream.Count)
+            {
+                Token_Class token = TokenStream[InputPointer].token_type;
+                if (token == Token_Class.LOGIC_AND_T || token == Token_Class.LOGIC_OR_T) {
+                    Node Bool_stat_N = new Node("Bool_stat");
 
+                    Bool_stat_N.Children.Add(Bool_Operator());
+                    Bool_stat_N.Children.Add(Condition());
+
+                    Node next_Bool_stat = Bool_stat(); //recursive call
+                    if (next_Bool_stat != null) {
+                        Bool_stat_N.Children.Add(next_Bool_stat);
+                    }
+                    return Bool_stat_N;
+                }
+            }
+            return null;
+        }
 
         //************************A. Mathematical Expressions & Strings****************\\
+
         Node Expression() {
             Node Expression_N = new Node("Expression");
             //implement it
@@ -477,7 +546,8 @@ namespace JASON_Compiler
             //implement it
             return Function_Call_N;
         }
-
+        Node Term() { 
+        }
 
         //*************shared functions************\\
 
