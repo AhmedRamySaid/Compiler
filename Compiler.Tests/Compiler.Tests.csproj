@@ -96,6 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IntegratedTester.cs" />
+    <Compile Include="ParserUnitTester.cs" />
     <Compile Include="RegexTester.cs" />
     <Compile Include="ScannerTester.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

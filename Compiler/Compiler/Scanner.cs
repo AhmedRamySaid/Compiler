@@ -15,6 +15,7 @@ public enum Token_Class
     PLUS_T, MINUS_T, MULTIPLY_T, DIVIDE_T, ASSIGN_T, LESS_THAN_T, GREATER_THAN_T,
     EQUAL_T, NOT_EQUAL_T, LOGIC_AND_T, LOGIC_OR_T, 
     L_CURLY_BRACKET_T, R_CURLY_BRACKET_T, L_PAREN_BRACKET_T, R_PAREN_BRACKET_T, SEMICOLON_T,COMMA_T
+   , MAIN_T 
 }
 
 namespace JASON_Compiler
@@ -41,6 +42,7 @@ namespace JASON_Compiler
 
         public Scanner()
         {
+            ReservedWords.Add("main", Token_Class.MAIN_T); //MAIN_T logic 
             ReservedWords.Add("int", Token_Class.INT_T);
             ReservedWords.Add("float", Token_Class.FLOAT_T);
             ReservedWords.Add("string", Token_Class.STRING_T);
